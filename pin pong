@@ -1,0 +1,81 @@
+import pygame
+
+# ініціалізація Pygame
+pygame.init()
+
+# встановлюємо розміри вікна
+WINDOW_WIDTH = 800
+WINDOW_HEIGHT = 600
+WINDOW_SIZE = (WINDOW_WIDTH, WINDOW_HEIGHT)
+
+# встановлюємо колір фону
+BACKGROUND_COLOR = (255, 255, 255)
+
+# створюємо клас для платформ
+class Platform(pygame.sprite.Sprite):
+    def __init__(self, x, y):
+        super().__init__()
+        self.image = pygame.Surface((20, 100))
+        self.image.fill((0, 0, 0))
+        self.rect = self.image.get_rect()
+        self.rect.center = (x, y)
+        self.speed = 5
+
+    def update(self, direction):
+        if direction == "up":
+            self.rect.y -= self.speed
+        elif direction == "down":
+            self.rect.y += self.speed
+
+        # обмежуємо рух платформ в межах вікна
+        if self.rect.top < 0:
+            self.rect.top = 0
+        elif self.rect.bottom > WINDOW_HEIGHT:
+            self.rect.bottom = WINDOW_HEIGHT
+
+# створюємо вікно
+screen = pygame.display.set_mode(WINDOW_SIZE)
+pygame.display.set_caption("Pong")
+
+# створюємо групу для платформ
+all_sprites = pygame.sprite.Group()
+
+# створюємо першу платформу
+platform1 = Platform(50, WINDOW_HEIGHT // 2)
+all_sprites.add(platform1)
+
+# створюємо другу платформу
+platform2 = Platform(WINDOW_WIDTH - 50, WINDOW_HEIGHT // 2)
+all_sprites.add(platform2)
+
+# головний цикл гри
+running = True
+while running:
+    # обробка подій
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running = False
+        elif event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_w:
+                platform1.update("up")
+            elif event.key == pygame.K_s:
+                platform1.update("down")
+            elif event.key == pygame.K_UP:
+                platform2.update("up")
+            elif event.key == pygame.K_DOWN:
+                platform2.update("down")
+
+    # очищаємо екран
+    screen.fill(BACKGROUND_COLOR)
+
+    # малюємо всі спрайти
+    all_sprites.draw(screen)
+
+    # оновлюємо екран
+    pygame.display.flip()
+
+    # обмежуємо кадри в секунду до 60
+    pygame.time.Clock().tick(60)
+
+# завершення Pygame
+pygame.quit()
